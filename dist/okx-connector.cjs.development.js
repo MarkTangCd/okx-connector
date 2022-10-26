@@ -171,10 +171,10 @@ var UserRejectedRequestError = /*#__PURE__*/function (_Error2) {
 
   return UserRejectedRequestError;
 }( /*#__PURE__*/_wrapNativeSuper(Error));
-var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
-  _inheritsLoose(BitKeepConnector, _AbstractConnector);
+var OKXConnector = /*#__PURE__*/function (_AbstractConnector) {
+  _inheritsLoose(OKXConnector, _AbstractConnector);
 
-  function BitKeepConnector(kwargs) {
+  function OKXConnector(kwargs) {
     var _this3;
 
     _this3 = _AbstractConnector.call(this, kwargs) || this;
@@ -185,18 +185,16 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
     return _this3;
   }
 
-  var _proto = BitKeepConnector.prototype;
+  var _proto = OKXConnector.prototype;
 
   _proto.handleChainChanged = function handleChainChanged(chainId) {
-    var _window$bitkeep;
-
     {
       console.log("Handling 'chainChanged' event with payload", chainId);
     }
 
     this.emitUpdate({
       chainId: chainId,
-      provider: (_window$bitkeep = window.bitkeep) == null ? void 0 : _window$bitkeep.ethereum
+      provider: window.okxwallet
     });
   };
 
@@ -223,15 +221,13 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
   };
 
   _proto.handleNetworkChanged = function handleNetworkChanged(networkId) {
-    var _window$bitkeep2;
-
     {
       console.log("Handling 'networkChanged' event with payload", networkId);
     }
 
     this.emitUpdate({
       chainId: networkId,
-      provider: (_window$bitkeep2 = window.bitkeep) == null ? void 0 : _window$bitkeep2.ethereum
+      provider: window.okxwallet
     });
   };
 
@@ -242,7 +238,7 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
 
         function _temp2() {
           return _extends({
-            provider: window.bitkeep.ethereum
+            provider: window.okxwallet
           }, account ? {
             account: account
           } : {});
@@ -251,10 +247,10 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
         var _temp = function () {
           if (!account) {
             // if enable is successful but doesn't return accounts, fall back to getAccount (not happy i have to do this...)
-            return Promise.resolve(window.bitkeep.ethereum.enable().then(function (sendReturn) {
+            return Promise.resolve(window.okxwallet.enable().then(function (sendReturn) {
               return sendReturn && parseSendReturn(sendReturn)[0];
-            })).then(function (_window$bitkeep$ether2) {
-              account = _window$bitkeep$ether2;
+            })).then(function (_window$okxwallet$ena) {
+              account = _window$okxwallet$ena;
             });
           }
         }();
@@ -267,25 +263,25 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
 
       var _this5 = this;
 
-      if (!window.bitkeep) {
+      if (!window.okxwallet) {
         throw new NoEthereumProviderError();
       }
 
-      if (window.bitkeep.ethereum.on) {
-        window.bitkeep.ethereum.on('chainChanged', _this5.handleChainChanged);
-        window.bitkeep.ethereum.on('accountsChanged', _this5.handleAccountsChanged);
-        window.bitkeep.ethereum.on('close', _this5.handleClose);
-        window.bitkeep.ethereum.on('networkChanged', _this5.handleNetworkChanged);
+      if (window.okxwallet.on) {
+        window.okxwallet.on('chainChanged', _this5.handleChainChanged);
+        window.okxwallet.on('accountsChanged', _this5.handleAccountsChanged);
+        window.okxwallet.on('close', _this5.handleClose);
+        window.okxwallet.on('networkChanged', _this5.handleNetworkChanged);
       } // try to activate + get account via eth_requestAccounts
 
 
       var account;
 
       var _temp6 = _catch(function () {
-        return Promise.resolve(window.bitkeep.ethereum.send('eth_requestAccounts').then(function (sendReturn) {
+        return Promise.resolve(window.okxwallet.send('eth_requestAccounts').then(function (sendReturn) {
           return parseSendReturn(sendReturn)[0];
-        })).then(function (_window$bitkeep$ether) {
-          account = _window$bitkeep$ether;
+        })).then(function (_window$okxwallet$sen) {
+          account = _window$okxwallet$sen;
         });
       }, function (error) {
         if (error.code === 4001) {
@@ -303,9 +299,7 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
 
   _proto.getProvider = function getProvider() {
     try {
-      var _window$bitkeep3;
-
-      return Promise.resolve((_window$bitkeep3 = window.bitkeep) == null ? void 0 : _window$bitkeep3.ethereum);
+      return Promise.resolve(window.okxwallet);
     } catch (e) {
       return Promise.reject(e);
     }
@@ -317,7 +311,7 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
         function _temp9() {
           if (!chainId) {
             try {
-              chainId = parseSendReturn(window.bitkeep.ethereum.send({
+              chainId = parseSendReturn(window.okxwallet.send({
                 method: 'net_version'
               }));
             } catch (_unused) {
@@ -326,10 +320,10 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
           }
 
           if (!chainId) {
-            if (window.bitkeep.ethereum.isDapper) {
-              chainId = parseSendReturn(window.bitkeep.ethereum.cachedResults.net_version);
+            if (window.okxwallet.isDapper) {
+              chainId = parseSendReturn(window.okxwallet.cachedResults.net_version);
             } else {
-              chainId = window.bitkeep.ethereum.chainId || window.bitkeep.ethereum.netVersion || window.bitkeep.ethereum.networkVersion || window.bitkeep.ethereum._chainId;
+              chainId = window.okxwallet.chainId || window.okxwallet.netVersion || window.okxwallet.networkVersion || window.okxwallet._chainId;
             }
           }
 
@@ -339,8 +333,8 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
         var _temp8 = function () {
           if (!chainId) {
             var _temp12 = _catch(function () {
-              return Promise.resolve(window.bitkeep.ethereum.send('net_version').then(parseSendReturn)).then(function (_window$bitkeep$ether4) {
-                chainId = _window$bitkeep$ether4;
+              return Promise.resolve(window.okxwallet.send('net_version').then(parseSendReturn)).then(function (_window$okxwallet$sen3) {
+                chainId = _window$okxwallet$sen3;
               });
             }, function () {
               "development" !== "production" ? warning(false, 'net_version was unsuccessful, falling back to net version v2') : void 0;
@@ -353,15 +347,15 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
         return _temp8 && _temp8.then ? _temp8.then(_temp9) : _temp9(_temp8);
       };
 
-      if (!window.bitkeep) {
+      if (!window.okxwallet) {
         throw new NoEthereumProviderError();
       }
 
       var chainId;
 
       var _temp14 = _catch(function () {
-        return Promise.resolve(window.bitkeep.ethereum.send('eth_chainId').then(parseSendReturn)).then(function (_window$bitkeep$ether3) {
-          chainId = _window$bitkeep$ether3;
+        return Promise.resolve(window.okxwallet.send('eth_chainId').then(parseSendReturn)).then(function (_window$okxwallet$sen2) {
+          chainId = _window$okxwallet$sen2;
         });
       }, function () {
         "development" !== "production" ? warning(false, 'eth_chainId was unsuccessful, falling back to net_version') : void 0;
@@ -378,7 +372,7 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
       var _temp21 = function _temp21() {
         function _temp17() {
           if (!account) {
-            account = parseSendReturn(window.bitkeep.ethereum.send({
+            account = parseSendReturn(window.okxwallet.send({
               method: 'eth_accounts'
             }))[0];
           }
@@ -389,10 +383,10 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
         var _temp16 = function () {
           if (!account) {
             var _temp20 = _catch(function () {
-              return Promise.resolve(window.bitkeep.ethereum.enable().then(function (sendReturn) {
+              return Promise.resolve(window.okxwallet.enable().then(function (sendReturn) {
                 return parseSendReturn(sendReturn)[0];
-              })).then(function (_window$bitkeep$ether6) {
-                account = _window$bitkeep$ether6;
+              })).then(function (_window$okxwallet$ena2) {
+                account = _window$okxwallet$ena2;
               });
             }, function () {
               "development" !== "production" ? warning(false, 'enable was unsuccessful, falling back to eth_accounts v2') : void 0;
@@ -405,17 +399,17 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
         return _temp16 && _temp16.then ? _temp16.then(_temp17) : _temp17(_temp16);
       };
 
-      if (!window.bitkeep) {
+      if (!window.okxwallet) {
         throw new NoEthereumProviderError();
       }
 
       var account;
 
       var _temp22 = _catch(function () {
-        return Promise.resolve(window.bitkeep.ethereum.send('eth_accounts').then(function (sendReturn) {
+        return Promise.resolve(window.okxwallet.send('eth_accounts').then(function (sendReturn) {
           return parseSendReturn(sendReturn)[0];
-        })).then(function (_window$bitkeep$ether5) {
-          account = _window$bitkeep$ether5;
+        })).then(function (_window$okxwallet$sen4) {
+          account = _window$okxwallet$sen4;
         });
       }, function () {
         "development" !== "production" ? warning(false, 'eth_accounts was unsuccessful, falling back to enable') : void 0;
@@ -428,22 +422,22 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
   };
 
   _proto.deactivate = function deactivate() {
-    if (window.bitkeep && window.bitkeep.ethereum.removeListener) {
-      window.bitkeep.ethereum.removeListener('chainChanged', this.handleChainChanged);
-      window.bitkeep.ethereum.removeListener('accountsChanged', this.handleAccountsChanged);
-      window.bitkeep.ethereum.removeListener('close', this.handleClose);
-      window.bitkeep.ethereum.removeListener('networkChanged', this.handleNetworkChanged);
+    if (window.okxwallet && window.okxwallet.removeListener) {
+      window.okxwallet.removeListener('chainChanged', this.handleChainChanged);
+      window.okxwallet.removeListener('accountsChanged', this.handleAccountsChanged);
+      window.okxwallet.removeListener('close', this.handleClose);
+      window.okxwallet.removeListener('networkChanged', this.handleNetworkChanged);
     }
   };
 
   _proto.isAuthorized = function isAuthorized() {
     try {
-      if (!window.bitkeep) {
+      if (!window.okxwallet) {
         return Promise.resolve(false);
       }
 
       return Promise.resolve(_catch(function () {
-        return Promise.resolve(window.bitkeep.ethereum.send('eth_accounts').then(function (sendReturn) {
+        return Promise.resolve(window.okxwallet.send('eth_accounts').then(function (sendReturn) {
           if (parseSendReturn(sendReturn).length > 0) {
             return true;
           } else {
@@ -458,10 +452,10 @@ var BitKeepConnector = /*#__PURE__*/function (_AbstractConnector) {
     }
   };
 
-  return BitKeepConnector;
+  return OKXConnector;
 }(abstractConnector.AbstractConnector);
 
-exports.BitKeepConnector = BitKeepConnector;
 exports.NoEthereumProviderError = NoEthereumProviderError;
+exports.OKXConnector = OKXConnector;
 exports.UserRejectedRequestError = UserRejectedRequestError;
-//# sourceMappingURL=bitkeep-connector.cjs.development.js.map
+//# sourceMappingURL=okx-connector.cjs.development.js.map

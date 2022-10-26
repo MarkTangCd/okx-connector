@@ -6,7 +6,7 @@ export declare class NoEthereumProviderError extends Error {
 export declare class UserRejectedRequestError extends Error {
     constructor();
 }
-export declare class BitKeepConnector extends AbstractConnector {
+export declare class OKXConnector extends AbstractConnector {
     constructor(kwargs: AbstractConnectorArguments);
     private handleChainChanged;
     private handleAccountsChanged;
