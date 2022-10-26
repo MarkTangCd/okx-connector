@@ -1,6 +1,6 @@
 {
   "name": "okx-connector",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple, maximally extensible, dependency minimized framework for building modern Ethereum dApps",
   "keywords": [
     "react",
